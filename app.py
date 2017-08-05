@@ -85,7 +85,37 @@ def join():
 
         db.session.commit()
 
-        return jsonify({'status': 'success', 'user_id': new_user.id})   
+        return jsonify({'status': 'success', 'user_id': new_user.id})
+
+@app.route('/login/', methods=['POST'])
+def login():
+    errors = {}
+
+    username = request.form.get('username')
+    if username is None:
+        return jsonify({'status': 'error', 'error': 'Username not defined.'})
+
+    password = request.form.get('password')
+    if password is None:
+        return jsonify({'status': 'error', 'error': 'Password not  defined.'})
+
+    if not username.strip() and not password.strip():
+        return jsonify({'status': 'error', 'error': 'Please enter your username and password.'})
+    elif not username.strip():
+        return jsonify({'status': 'error', 'error': 'Please enter your username.'})
+    elif not password.strip():
+        return jsonify({'status': 'error', 'error': 'Please enter your password.'})
+
+    user = db.session.query(User).filter_by(username=username).first()
+    if user is not None:
+        if check_password_hash(user.password, password):
+            return jsonify({'status': 'success', 'authentication': 'You have been logged in successfully.'})
+        else:
+            return jsonify({'status': 'error', 'error': 'Username and Password does not match.'})
+    else:
+        return jsonify({'status': 'error', 'error': 'Username and Password does not match.'})
+
+
 
 if __name__ == '__main__':
     app.run()
