@@ -27,6 +27,9 @@ class Interest(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
     interest = db.Column(db.String(120), unique=True, nullable=False)
 
+    def serialize(self):
+        return {'id': self.id, 'name': self.interest}
+
 
 @app.route('/')
 def home():
@@ -87,6 +90,7 @@ def join():
 
         return jsonify({'status': 'success', 'user_id': new_user.id})
 
+
 @app.route('/login/', methods=['POST'])
 def login():
     errors = {}
@@ -115,6 +119,15 @@ def login():
     else:
         return jsonify({'status': 'error', 'error': 'Username and Password does not match.'})
 
+
+@app.route('/get_interests/', methods=['GET'])
+def get_interests():
+    interests = db.session.query(Interest).all()
+    json_interests = []
+    for interest in interests:
+        json_interests.append(interest.serialize())
+
+    return jsonify({'status': 'success', 'interests': json_interests})
 
 
 if __name__ == '__main__':
