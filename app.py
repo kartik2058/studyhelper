@@ -1,10 +1,11 @@
+import os
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
 
 app = Flask(__name__)
-app.config.from_pyfile('./config.py')
+app.config.from_object(os.environ['APP_SETTINGS'])
 db = SQLAlchemy(app)
 
 users_interests = db.Table('users_interests', db.Column('user_id', db.Integer, db.ForeignKey('users.id')), db.Column('interest_id', db.Integer, db.ForeignKey('interests.id')))
