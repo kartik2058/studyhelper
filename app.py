@@ -51,8 +51,8 @@ def join():
             elif len(username) >= 20:
                 errors['username'] = 'Username should be less then 20 characters.'
             else:
-                existing_username = db.session.query(User).filter_by(username=username)
-                if existing_username is None:
+                existing_username = db.session.query(User).filter_by(username=username).first()
+                if existing_username is not None:
                     errors['username'] = 'Username is already taken, please try another username.'
     else:
         errors['username'] = 'Username not defined.'
