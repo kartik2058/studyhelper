@@ -23,6 +23,7 @@ class User(db.Model):
     subjects = db.relationship('Subject', secondary=users_interested_subjects, backref='students', lazy='dynamic')
     questions = db.relationship('Question', backref='user', lazy='dynamic')
     answers = db.relationship('Answer', backref='user', lazy='dynamic')
+    comments = db.relationship('Comment', backref='user', lazy='dynamic', cascade='all, delete-orphan')
 
 
 class Subject(db.Model):
@@ -31,7 +32,7 @@ class Subject(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
 
-    questions = db.relationship('Question', backref='subject', lazy='dynamic', cascade="all, delete-orphan")
+    questions = db.relationship('Question', backref='subject', lazy='dynamic', cascade='all, delete-orphan')
 
     def serialize(self):
         return {'id': self.id, 'name': self.name}
@@ -48,11 +49,11 @@ class Question(db.Model):
     subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    answers = db.relationship('Answer', backref='question', lazy='dynamic', cascade="all, delete-orphan")
+    answers = db.relationship('Answer', backref='question', lazy='dynamic', cascade='all, delete-orphan')
 
 
 class Answer(db.Model):
-    __tablename__ = ' answers'
+    __tablename__ = 'answers'
 
     id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
     answer = db.Column(db.Text, nullable=False)
@@ -62,6 +63,20 @@ class Answer(db.Model):
     votes = db.Column(db.Integer, default=0, nullable=False)
 
     question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    comments = db.relationship('Comment', backref='answer', lazy='dynamic', cascade='all, delete-orphan')
+
+
+class Comment(db.Model):
+    __tablename__ = 'comments'
+
+    id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
+    comment = db.Column(db.Text, nullable=False)
+    posted_on = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
+    updated_on = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
+
+    answer_id = db.Column(db.Integer, db.ForeignKey('answers.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
