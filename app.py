@@ -1,8 +1,9 @@
 import os
+import re
+import datetime
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-import re
 
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
@@ -14,12 +15,13 @@ users_interested_subjects = db.Table('users_interested_subjects', db.Column('use
 class User(db.Model):
     __tablename__ = 'users'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     password = db.Column(db.Text, nullable=False)
     points = db.Column(db.Integer, nullable=False, default=0)
 
     subjects = db.relationship('Subject', secondary=users_interested_subjects, backref='students', lazy='dynamic')
+    questions = db.relationship('Question', backref='user', lazy='dynamic')
 
 
 class Subject(db.Model):
@@ -28,8 +30,22 @@ class Subject(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
 
+    questions = db.relationship('Question', backref='subject', lazy='dynamic')
+
     def serialize(self):
         return {'id': self.id, 'name': self.name}
+
+
+class Question(db.Model):
+    __tablename__ = 'questions'
+
+    id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
+    question = db.Column(db.Text, nullable=False)
+    posted_on = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    updated_on = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
+    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
 @app.route('/')
