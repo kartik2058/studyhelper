@@ -128,7 +128,11 @@ def get_subjects():
     for subject in subjects:
         subjects_json.append(subject.serialize())
 
+    if not subjects_json:
+        return jsonify({'status': 'error', 'error': 'No subject found.'})
+
     return jsonify({'status': 'success', 'subjects': subjects_json})
+
 
 @app.route('/subjects/new/', methods=['POST'])
 def create_subject():
