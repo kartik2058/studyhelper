@@ -130,6 +130,19 @@ def get_subjects():
 
     return jsonify({'status': 'success', 'subjects': subjects_json})
 
+@app.route('/subjects/new/', methods=['POST'])
+def create_subject():
+    name = request.form.get('name')
+    if name is None:
+        return jsonify({'status': 'error', 'error': 'Subject name not defined.'})
+    else:
+        if not name.strip():
+            return jsonify({'status': 'error', 'error': 'Subject name cannot be empty.'})
+
+    subject = Subject(name=name)
+    db.session.add(subject)
+    db.session.commit()
+    return jsonify({'status': 'success', 'subject_id': subject.id})
 
 if __name__ == '__main__':
     app.run()
