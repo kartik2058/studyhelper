@@ -143,6 +143,10 @@ def create_subject():
         if not name.strip():
             return jsonify({'status': 'error', 'error': 'Subject name cannot be empty.'})
 
+    existing_subject = db.session.query(Subject).filter_by(name=name).first()
+    if existing_subject is not None:
+        return jsonify({'status': 'error', 'error': name + ' is already present.'})
+
     subject = Subject(name=name)
     db.session.add(subject)
     db.session.commit()
