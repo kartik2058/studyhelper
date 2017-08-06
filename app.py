@@ -10,6 +10,7 @@ app.config.from_object(os.environ['APP_SETTINGS'])
 db = SQLAlchemy(app)
 
 users_interested_subjects = db.Table('users_interested_subjects', db.Column('user_id', db.Integer, db.ForeignKey('users.id')), db.Column('subject_id', db.Integer, db.ForeignKey('subjects.id')))
+chat_members = db.Table('chat_members', db.Column('user_id', db.Integer, db.ForeignKey('users.id')), db.Column('chat_id', db.Integer, db.ForeignKey('chats.id')))
 
 
 class User(db.Model):
@@ -78,6 +79,14 @@ class Comment(db.Model):
 
     answer_id = db.Column(db.Integer, db.ForeignKey('answers.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+
+class Chat(db.Model):
+    __tablename__ = 'chats'
+
+    id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
+
+    users = db.relationship('Chat', secondary=chat_members, backref='chats', lazy='dynamic')
 
 
 @app.route('/')
