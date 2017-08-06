@@ -134,7 +134,7 @@ def get_subjects():
     return jsonify({'status': 'success', 'subjects': subjects_json})
 
 
-@app.route('/subjects/<int:subject_id>', methods=['GET'])
+@app.route('/subjects/<int:subject_id>/', methods=['GET'])
 def get_subject(subject_id):
     subject = db.session.query(Subject).get(int(subject_id))
 
@@ -142,6 +142,20 @@ def get_subject(subject_id):
         return jsonify({'status': 'error', 'error': 'No subject found.'})
 
     return jsonify({'status': 'success', 'subject': subject.serialize()})
+
+
+@app.route('/subjects/search/<string:subject_name>/', methods=['GET'])
+def search_subjects(subject_name):
+    subjects = db.session.query(Subject).filter(Subject.name.like(subject_name+'%')).all()
+
+    if not subjects:
+        return jsonify({'status': 'error', 'error': 'No subject found.'})
+
+    subjects_json = []
+    for subject in subjects:
+        subjects_json.append(subject.serialize())
+
+    return jsonify({'status': 'success', 'subjects': subjects_json})
 
 
 @app.route('/subjects/new/', methods=['POST'])
