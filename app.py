@@ -134,6 +134,16 @@ def get_subjects():
     return jsonify({'status': 'success', 'subjects': subjects_json})
 
 
+@app.route('/subjects/<int:subject_id>', methods=['GET'])
+def get_subject(subject_id):
+    subject = db.session.query(Subject).get(int(subject_id))
+
+    if subject is None:
+        return jsonify({'status': 'error', 'error': 'No subject found.'})
+
+    return jsonify({'status': 'success', 'subject': subject.serialize()})
+
+
 @app.route('/subjects/new/', methods=['POST'])
 def create_subject():
     name = request.form.get('name')
