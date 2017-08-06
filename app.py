@@ -22,6 +22,7 @@ class User(db.Model):
 
     subjects = db.relationship('Subject', secondary=users_interested_subjects, backref='students', lazy='dynamic')
     questions = db.relationship('Question', backref='user', lazy='dynamic')
+    answers = db.relationship('Answer', backref='user', lazy='dynamic')
 
 
 class Subject(db.Model):
@@ -30,7 +31,7 @@ class Subject(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
 
-    questions = db.relationship('Question', backref='subject', lazy='dynamic')
+    questions = db.relationship('Question', backref='subject', lazy='dynamic', cascade="all, delete-orphan")
 
     def serialize(self):
         return {'id': self.id, 'name': self.name}
@@ -41,10 +42,26 @@ class Question(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
     question = db.Column(db.Text, nullable=False)
-    posted_on = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    updated_on = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    posted_on = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
+    updated_on = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
 
     subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    answers = db.relationship('Answer', backref='question', lazy='dynamic', cascade="all, delete-orphan")
+
+
+class Answer(db.Model):
+    __tablename__ = ' answers'
+
+    id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
+    answer = db.Column(db.Text, nullable=False)
+    posted_on = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
+    updated_on = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
+    is_suggested = db.Column(db.Boolean, default=False, nullable=False)
+    votes = db.Column(db.Integer, default=0, nullable=False)
+
+    question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
