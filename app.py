@@ -8,7 +8,7 @@ app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
 db = SQLAlchemy(app)
 
-users_interests = db.Table('users_interests', db.Column('user_id', db.Integer, db.ForeignKey('users.id')), db.Column('interest_id', db.Integer, db.ForeignKey('interests.id')))
+users_interested_subjects = db.Table('users_interested_subjects', db.Column('user_id', db.Integer, db.ForeignKey('users.id')), db.Column('subject_id', db.Integer, db.ForeignKey('subjects.id')))
 
 
 class User(db.Model):
@@ -19,17 +19,17 @@ class User(db.Model):
     password = db.Column(db.Text, nullable=False)
     points = db.Column(db.Integer, nullable=False, default=0)
 
-    interests = db.relationship('Interest', secondary=users_interests, backref='students', lazy='dynamic')
+    subjects = db.relationship('Subject', secondary=users_interested_subjects, backref='students', lazy='dynamic')
 
 
-class Interest(db.Model):
-    __tablename__ = 'interests'
+class Subject(db.Model):
+    __tablename__ = 'subjects'
 
     id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
-    interest = db.Column(db.String(120), unique=True, nullable=False)
+    name = db.Column(db.String(120), unique=True, nullable=False)
 
     def serialize(self):
-        return {'id': self.id, 'name': self.interest}
+        return {'id': self.id, 'name': self.name}
 
 
 @app.route('/')
@@ -69,11 +69,11 @@ def join():
     else:
         errors['password'] = 'Password not defined.'
 
-    interests = request.form.get('interests')
-    if interests is None:
-        errors['interests'] = 'Interests not defined.'
+    interested_subjects = request.form.get('interested_subjects')
+    if interested_subjects is None:
+        errors['interested_subjects'] = 'Interested Subjects not defined.'
     else:
-        interests = [int(x) for x in re.compile("^\s+|\s*,\s*|\s+$").split(interests) if x]
+        interested_subjects = [int(x) for x in re.compile("^\s+|\s*,\s*|\s+$").split(interested_subjects) if x]
 
     if errors:
         return jsonify({'status': 'error', 'errors': errors})
@@ -82,10 +82,10 @@ def join():
         new_user = User(username=username, password=password)
         db.session.add(new_user)
 
-        for interest in interests:
-            interest = db.session.query(Interest).get(interest)
-            if interest is not None:
-                interest.students.append(new_user)
+        for subject in interested_subjects:
+            subject = db.session.query(Subject).get(subject)
+            if subject is not None:
+                subject.students.append(new_user)
 
         db.session.commit()
 
@@ -121,14 +121,14 @@ def login():
         return jsonify({'status': 'error', 'error': 'Username and Password does not match.'})
 
 
-@app.route('/get_interests/', methods=['GET'])
-def get_interests():
-    interests = db.session.query(Interest).all()
-    json_interests = []
-    for interest in interests:
-        json_interests.append(interest.serialize())
+@app.route('/subjects/', methods=['GET'])
+def get_subjects():
+    subjects = db.session.query(Subject).all()
+    subjects_json = []
+    for subject in subjects:
+        subjects_json.append(subject.serialize())
 
-    return jsonify({'status': 'success', 'interests': json_interests})
+    return jsonify({'status': 'success', 'subjects': subjects_json})
 
 
 if __name__ == '__main__':
