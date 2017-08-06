@@ -9,7 +9,7 @@ app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
 db = SQLAlchemy(app)
 
-users_interested_subjects = db.Table('users_interested_subjects', db.Column('user_id', db.Integer, db.ForeignKey('users.id')), db.Column('subject_id', db.Integer, db.ForeignKey('subjects.id')))
+subjects_interested_in = db.Table('subjects_interested_in', db.Column('user_id', db.Integer, db.ForeignKey('users.id')), db.Column('subject_id', db.Integer, db.ForeignKey('subjects.id')))
 chat_members = db.Table('chat_members', db.Column('user_id', db.Integer, db.ForeignKey('users.id')), db.Column('chat_id', db.Integer, db.ForeignKey('chats.id')))
 
 
@@ -21,10 +21,11 @@ class User(db.Model):
     password = db.Column(db.Text, nullable=False)
     points = db.Column(db.Integer, nullable=False, default=0)
 
-    subjects = db.relationship('Subject', secondary=users_interested_subjects, backref='students', lazy='dynamic')
+    subjects = db.relationship('Subject', secondary=subjects_interested_in, backref='students', lazy='dynamic')
     questions = db.relationship('Question', backref='user', lazy='dynamic')
     answers = db.relationship('Answer', backref='user', lazy='dynamic')
     comments = db.relationship('Comment', backref='user', lazy='dynamic', cascade='all, delete-orphan')
+    messages = db.relationship('Message', backref='user', lazy='dynamic')
 
 
 class Subject(db.Model):
@@ -87,6 +88,18 @@ class Chat(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
 
     users = db.relationship('Chat', secondary=chat_members, backref='chats', lazy='dynamic')
+    messages = db.relationship('Message', backref='chat', lazy='dynamic', cascade='all, delete-orphan')
+
+
+class Message(db.Model):
+    __tablename__ = 'messages'
+
+    id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
+    message = db.Column(db.Text, nullable=False)
+    posted_on = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
+
+    chat_id = db.Column(db.Integer, db.ForeignKey('chats.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
 @app.route('/')
