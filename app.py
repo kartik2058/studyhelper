@@ -169,7 +169,8 @@ def create_subject():
 
     existing_subject = db.session.query(Subject).filter_by(name=name).first()
     if existing_subject is not None:
-        return jsonify({'status': 'error', 'error': name + ' is already present.'})
+        return jsonify({'status': 'error', 'error': name + ' is already present.',
+                        'existing_subject_id': existing_subject.id})
 
     subject = Subject(name=name)
     db.session.add(subject)
