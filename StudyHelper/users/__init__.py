@@ -86,3 +86,12 @@ def login():
             return jsonify({'status': 'error', 'error': 'Username and Password does not match.'})
     else:
         return jsonify({'status': 'error', 'error': 'Username and Password does not match.'})
+
+
+@users_module.route('/<int:user_id>/', methods=['GET'])
+def get_user(user_id):
+    user = db.session.query(User).get(user_id)
+    if user is None:
+        return jsonify({'status': 'error', 'error': 'No user found.'})
+
+    return jsonify({'status': 'success', 'user': user.serialize()})

@@ -19,6 +19,9 @@ class User(db.Model):
     comments = db.relationship('Comment', backref='user', lazy='dynamic', cascade='all, delete-orphan')
     messages = db.relationship('Message', backref='user', lazy='dynamic')
 
+    def serialize(self):
+        return {'id': self.id, 'username': self.username, 'points': self.points}
+
 
 class Subject(db.Model):
     __tablename__ = 'subjects'
