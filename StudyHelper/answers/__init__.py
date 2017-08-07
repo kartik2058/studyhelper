@@ -92,6 +92,7 @@ def update_answer(question_id, answer_id):
         return make_error('Answer cannot be empty.', 415)
 
     answer.answer = new_answer
+    answer.updated_on = datetime.datetime.utcnow()
     db.session.commit()
 
     return jsonify({'status': 'success'})
