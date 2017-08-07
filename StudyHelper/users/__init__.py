@@ -7,6 +7,7 @@ users_module = Blueprint('users', __name__)
 
 
 @users_module.route('/signup/', methods=['POST'])
+@users_module.route('/signup', methods=['POST'])
 def signup():
     errors = {}
 
@@ -62,6 +63,7 @@ def signup():
 
 
 @users_module.route('/login/', methods=['POST'])
+@users_module.route('/login', methods=['POST'])
 def login():
     username = request.form.get('username')
     if username is None:
@@ -89,6 +91,7 @@ def login():
 
 
 @users_module.route('/<int:user_id>/', methods=['GET'])
+@users_module.route('/<int:user_id>', methods=['GET'])
 def get_user(user_id):
     user = db.session.query(User).get(user_id)
     if user is None:

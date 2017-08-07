@@ -5,6 +5,7 @@ subjects_module = Blueprint('subjects', __name__)
 
 
 @subjects_module.route('/', methods=['GET'])
+@subjects_module.route('', methods=['GET'])
 def get_subjects():
     subjects = db.session.query(Subject).all()
     subjects_json = []
@@ -18,6 +19,7 @@ def get_subjects():
 
 
 @subjects_module.route('/<int:subject_id>/', methods=['GET'])
+@subjects_module.route('/<int:subject_id>', methods=['GET'])
 def get_subject(subject_id):
     subject = db.session.query(Subject).get(int(subject_id))
 
@@ -28,6 +30,7 @@ def get_subject(subject_id):
 
 
 @subjects_module.route('/search/<string:subject_name>/', methods=['GET'])
+@subjects_module.route('/search/<string:subject_name>', methods=['GET'])
 def search_subjects(subject_name):
     subjects = db.session.query(Subject).filter(Subject.name.like(subject_name+'%')).all()
 
@@ -42,6 +45,7 @@ def search_subjects(subject_name):
 
 
 @subjects_module.route('/new/', methods=['POST'])
+@subjects_module.route('/new', methods=['POST'])
 def create_subject():
     name = request.form.get('name')
     if name is None:
