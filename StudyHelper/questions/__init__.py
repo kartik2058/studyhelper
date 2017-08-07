@@ -1,3 +1,4 @@
+import datetime
 from flask import request, jsonify, Blueprint
 from StudyHelper.models import db, Question, User
 from StudyHelper import make_error
@@ -61,3 +62,27 @@ def create_question():
     db.session.commit()
 
     return jsonify({'status': 'success', 'question_id': new_question.id})
+
+
+@questions_module.route('/update/<int:question_id>/', methods=['POST'])
+@questions_module.route('/update/<int:question_id>', methods=['POST'])
+def update_question(question_id):
+    question = db.session.query(Question).get(question_id)
+
+    if question is None:
+        return make_error('No question was found with id: ' + str(question_id), 309)
+
+    new_question = request.form.get('question')
+    if new_question is not None:
+        if not new_question.strip():
+            return make_error('Question cannot be empty.', 311)
+        else:
+            question.question = new_question
+    else:
+        return make_error('question is not defined.', 310)
+
+    question.updated_on = datetime.datetime.utcnow()
+
+    db.session.commit()
+
+    return jsonify({'status': 'success'})
