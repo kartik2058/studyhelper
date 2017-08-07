@@ -1,5 +1,6 @@
 from flask import request, jsonify, Blueprint
 from StudyHelper.models import db, Subject
+from StudyHelper import make_error
 
 subjects_module = Blueprint('subjects', __name__)
 
@@ -13,7 +14,7 @@ def get_subjects():
         subjects_json.append(subject.serialize())
 
     if not subjects_json:
-        return jsonify({'status': 'error', 'error': 'No subject found.'})
+        return make_error('No subjects found.', 201)
 
     return jsonify({'status': 'success', 'subjects': subjects_json})
 
@@ -24,7 +25,7 @@ def get_subject(subject_id):
     subject = db.session.query(Subject).get(int(subject_id))
 
     if subject is None:
-        return jsonify({'status': 'error', 'error': 'No subject found.'})
+        return make_error('No subject found.', 202)
 
     return jsonify({'status': 'success', 'subject': subject.serialize()})
 
@@ -35,7 +36,7 @@ def search_subjects(subject_name):
     subjects = db.session.query(Subject).filter(Subject.name.like(subject_name+'%')).all()
 
     if not subjects:
-        return jsonify({'status': 'error', 'error': 'No subject found.'})
+        return make_error('No subjects found', 203)
 
     subjects_json = []
     for subject in subjects:
@@ -49,15 +50,14 @@ def search_subjects(subject_name):
 def create_subject():
     name = request.form.get('name')
     if name is None:
-        return jsonify({'status': 'error', 'error': 'Subject name not defined.'})
+        return make_error('Subject name is not defined.', 204)
     else:
         if not name.strip():
-            return jsonify({'status': 'error', 'error': 'Subject name cannot be empty.'})
+            return make_error('Subject name cannot be empty', 205)
 
     existing_subject = db.session.query(Subject).filter_by(name=name).first()
     if existing_subject is not None:
-        return jsonify({'status': 'error', 'error': name + ' is already present.',
-                        'existing_subject_id': existing_subject.id})
+        return make_error(name + 'is already present', 206, 'existing_subject_id', existing_subject.id)
 
     subject = Subject(name=name)
     db.session.add(subject)

@@ -1,7 +1,9 @@
 from flask import request, jsonify, Blueprint
 from StudyHelper.models import db, Question, User
+from StudyHelper import make_error
 
 questions_module = Blueprint('questions', __name__)
+
 
 @questions_module.route('/', methods=['GET'])
 @questions_module.route('', methods=['GET'])
@@ -13,7 +15,7 @@ def get_questions():
         questions_json.append(question.serialize())
 
     if not questions_json:
-        return jsonify({'status': 'error', 'error': 'No questions found.'})
+        return make_error('No questions found', 301)
 
     return jsonify({'status': 'success', 'questions': questions_json})
 
@@ -24,24 +26,34 @@ def get_question(question_id):
     question = db.session.query(Question).get(question_id)
 
     if question is None:
-        return jsonify({'status': 'error', 'error': 'No question found.'})
+        return make_error('No question found.', 302)
 
     return jsonify({'status': 'success', 'questions': question.serialize()})
+
 
 @questions_module.route('/new/', methods=['POST'])
 @questions_module.route('/new', methods=['POST'])
 def create_question():
     question = request.form.get('question')
     if question is None:
-        return jsonify({'status': 'error', 'error': 'Question not defined.'})
+        return make_error('question is not defined.', 303)
+    elif not question.strip():
+        return make_error('question cannot be empty.', 304)
 
     user_id = request.form.get('user_id')
     if user_id is None:
-        return jsonify({'status': 'error', 'error': 'user_id not defined.'})
+        return make_error('user_id is not defined.', 305)
+    elif not user_id.strip():
+        return make_error('user_id cannot be empty.', 306)
 
-    user = db.session.query(User).get(user_id)
+    try:
+        int(user_id)
+    except:
+        return make_error('user_id is invalid.', 307)
+
+    user = db.session.query(User).get(int(user_id))
     if user is None:
-        return jsonify({'status': 'error', 'error': 'No user found with user_id: ' + str(user_id)})
+        return make_error('No user found with user_id: ' + str(user_id), 308)
 
     new_question = Question(question=question, user=user)
 

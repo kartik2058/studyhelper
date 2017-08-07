@@ -1,5 +1,6 @@
 from flask import request, jsonify, Blueprint
 from StudyHelper.models import db, User, Subject
+from StudyHelper import make_error
 import re
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -65,29 +66,31 @@ def signup():
 @users_module.route('/login/', methods=['POST'])
 @users_module.route('/login', methods=['POST'])
 def login():
+    errors = {}
+
     username = request.form.get('username')
     if username is None:
-        return jsonify({'status': 'error', 'error': 'Username not defined.'})
+        errors['username'] = 'Username not defined.'
+    elif not username.strip():
+        errors['username'] = 'Please enter your username.'
 
     password = request.form.get('password')
     if password is None:
-        return jsonify({'status': 'error', 'error': 'Password not  defined.'})
-
-    if not username.strip() and not password.strip():
-        return jsonify({'status': 'error', 'error': 'Please enter your username and password.'})
-    elif not username.strip():
-        return jsonify({'status': 'error', 'error': 'Please enter your username.'})
+        errors['password'] = 'Password not  defined.'
     elif not password.strip():
-        return jsonify({'status': 'error', 'error': 'Please enter your password.'})
+        errors['password'] = 'Please enter your password.'
+
+    if errors:
+        return jsonify({'status': 'error', 'errors': errors})
 
     user = db.session.query(User).filter_by(username=username).first()
     if user is not None:
         if check_password_hash(user.password, password):
             return jsonify({'status': 'success', 'authentication': 'You have been logged in successfully.'})
         else:
-            return jsonify({'status': 'error', 'error': 'Username and Password does not match.'})
+            return make_error('Username and Password does not match.', 101)
     else:
-        return jsonify({'status': 'error', 'error': 'Username and Password does not match.'})
+        return make_error('Username and Password does not match.', 101)
 
 
 @users_module.route('/<int:user_id>/', methods=['GET'])
@@ -95,6 +98,6 @@ def login():
 def get_user(user_id):
     user = db.session.query(User).get(user_id)
     if user is None:
-        return jsonify({'status': 'error', 'error': 'No user found.'})
+        return make_error('No user found with user_id: ' + str(user_id), 102)
 
     return jsonify({'status': 'success', 'user': user.serialize()})

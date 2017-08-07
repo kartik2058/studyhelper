@@ -1,10 +1,19 @@
 import os
-from flask import Flask
+from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
 db = SQLAlchemy(app)
+
+
+def make_error(error_message, error_code, extra_key=None, extra_value=None):
+    if extra_key is not None and extra_value is not None:
+        return jsonify({'status': 'error', 'error_code': error_code, 'error_message': error_message, extra_key: extra_value})
+    else:
+        return jsonify(
+            {'status': 'error', 'error_code': error_code, 'error_message': error_message})
+
 
 @app.route('/')
 def home():
