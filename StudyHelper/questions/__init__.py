@@ -16,3 +16,14 @@ def get_questions():
         return jsonify({'status': 'error', 'error': 'No questions found.'})
 
     return jsonify({'status': 'success', 'questions': questions_json})
+
+
+@questions_module.route('/<int:question_id>/', methods=['GET'])
+@questions_module.route('/<int:question_id>', methods=['GET'])
+def get_question(question_id):
+    question = db.session.query(Question).get(question_id)
+
+    if question is None:
+        return jsonify({'status': 'error', 'error': 'No question found.'})
+
+    return jsonify({'status': 'success', 'questions': question.serialize()})
