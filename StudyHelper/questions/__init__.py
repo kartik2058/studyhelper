@@ -27,7 +27,7 @@ def get_question(question_id):
     question = db.session.query(Question).get(question_id)
 
     if question is None:
-        return make_error('No question found.', 302)
+        return make_error('No question found with question_id: ' + str(question_id), 302)
 
     return jsonify({'status': 'success', 'questions': question.serialize()})
 
@@ -39,7 +39,7 @@ def create_question():
     if question is None:
         return make_error('question is not defined.', 303)
     elif not question.strip():
-        return make_error('question cannot be empty.', 304)
+        return make_error('Question field cannot be empty.', 304)
 
     user_id = request.form.get('user_id')
     if user_id is None:
@@ -54,7 +54,7 @@ def create_question():
 
     user = db.session.query(User).get(int(user_id))
     if user is None:
-        return make_error('No user found with user_id: ' + str(user_id), 308)
+        return make_error('No user found with user_id: ' + user_id, 308)
 
     new_question = Question(question=question, user=user)
 
@@ -75,7 +75,7 @@ def update_question(question_id):
     new_question = request.form.get('question')
     if new_question is not None:
         if not new_question.strip():
-            return make_error('Question cannot be empty.', 311)
+            return make_error('Question field cannot be empty.', 311)
         else:
             question.question = new_question
     else:

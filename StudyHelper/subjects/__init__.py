@@ -25,7 +25,7 @@ def get_subject(subject_id):
     subject = db.session.query(Subject).get(int(subject_id))
 
     if subject is None:
-        return make_error('No subject found.', 202)
+        return make_error('No subject found with subject_id: ' + str(subject_id), 202)
 
     return jsonify({'status': 'success', 'subject': subject.serialize()})
 
@@ -36,7 +36,7 @@ def search_subjects(subject_name):
     subjects = db.session.query(Subject).filter(Subject.name.like(subject_name+'%')).all()
 
     if not subjects:
-        return make_error('No subjects found', 203)
+        return make_error('No subjects found matching ' + subject_name, 203)
 
     subjects_json = []
     for subject in subjects:

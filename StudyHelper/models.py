@@ -49,7 +49,7 @@ class Question(db.Model):
     answers = db.relationship('Answer', backref='question', lazy='dynamic', cascade='all, delete-orphan')
 
     def serialize(self):
-        return {'id': self.id, 'question': self.question, 'posted_on': self.posted_on, 'updated_on': self.updated_on}
+        return {'id': self.id, 'question': self.question, 'posted_on': self.posted_on, 'updated_on': self.updated_on, 'asked_by': self.user_id, 'subject_id': self.subject_id}
 
 
 class Answer(db.Model):
@@ -68,7 +68,7 @@ class Answer(db.Model):
     comments = db.relationship('Comment', backref='answer', lazy='dynamic', cascade='all, delete-orphan')
 
     def serialize(self):
-        return {'id': self.id, 'answer': self.answer, 'posted_on': self.posted_on, 'updated_on': self.updated_on, 'is_suggested': self.is_suggested, 'votes': self.votes}
+        return {'id': self.id, 'answer': self.answer, 'posted_on': self.posted_on, 'updated_on': self.updated_on, 'is_suggested': self.is_suggested, 'votes': self.votes, 'answered_by': self.user_id, 'question_id': self.question_id}
 
 
 class Comment(db.Model):
@@ -81,6 +81,9 @@ class Comment(db.Model):
 
     answer_id = db.Column(db.Integer, db.ForeignKey('answers.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    def serialize(self):
+        return {'id': self.id, 'comment': self.comment, 'posted_on': self.posted_on, 'updated_on': self.updated_on, 'commented_by': self.user_id, 'answer_id': self.answer_id}
 
 
 class Chat(db.Model):

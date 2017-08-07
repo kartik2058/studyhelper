@@ -32,9 +32,13 @@ def get_answer(question_id, answer_id):
     if question is None:
         return make_error('No question found with id: ' + str(question_id), 403)
 
-    answer = db.session.query(Answer).get(answer_id)
+    answer = None
+    for looping_answer in question.answers:
+        if looping_answer.id == answer_id:
+            answer = looping_answer
+
     if answer is None:
-        return make_error('No answer found with id: ' + str(answer_id), 404)
+        return make_error('No answer found with answer_id: ' + str(answer_id) + ' and question_id: ' + str(question_id), 404)
 
     return jsonify({'status': 'success', 'answer': answer.serialize()})
 
@@ -50,7 +54,7 @@ def create_answer(question_id):
     if answer is None:
         return make_error('answer is not defined.', 406)
     if not answer.strip():
-        return make_error('Answer cannot be empty.', 407)
+        return make_error('Answer field cannot be empty.', 407)
 
     user_id = request.form.get('user_id')
     if user_id is None:
@@ -65,7 +69,7 @@ def create_answer(question_id):
 
     user = db.session.query(User).get(int(user_id))
     if user is None:
-        return make_error('No user found with user_id: ' + str(user_id), 411)
+        return make_error('No user found with user_id: ' + user_id, 411)
 
     new_answer = Answer(answer=answer, question=question, user=user)
     db.session.add(new_answer)
@@ -81,7 +85,11 @@ def update_answer(question_id, answer_id):
     if question is None:
         return make_error('No question found with id: ' + str(question_id), 412)
 
-    answer = db.session.query(Answer).get(answer_id)
+    answer = None
+    for looping_answer in question.answers:
+        if looping_answer.id == answer_id:
+            answer = looping_answer
+
     if answer is None:
         return make_error('No answer found with id: ' + str(answer_id), 413)
 
@@ -89,7 +97,7 @@ def update_answer(question_id, answer_id):
     if new_answer is None:
         return make_error('answer is not defined.', 414)
     if not new_answer.strip():
-        return make_error('Answer cannot be empty.', 415)
+        return make_error('Answer field cannot be empty.', 415)
 
     answer.answer = new_answer
     answer.updated_on = datetime.datetime.utcnow()
