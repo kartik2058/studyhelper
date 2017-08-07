@@ -12,6 +12,8 @@ def home():
 
 from StudyHelper.users import users_module
 from StudyHelper.subjects import subjects_module
+from StudyHelper.questions import questions_module
 
 app.register_blueprint(users_module, url_prefix='/users')
 app.register_blueprint(subjects_module, url_prefix='/subjects')
+app.register_blueprint(questions_module, url_prefix='/questions')
