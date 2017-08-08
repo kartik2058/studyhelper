@@ -25,6 +25,7 @@ from StudyHelper.questions import questions_module
 from StudyHelper.answers import answers_module
 from StudyHelper.comments import comments_module
 from StudyHelper.chats import chats_module
+from StudyHelper.messages import messages_module
 
 app.register_blueprint(users_module, url_prefix='/users')
 app.register_blueprint(subjects_module, url_prefix='/subjects')
@@ -32,3 +33,4 @@ app.register_blueprint(questions_module, url_prefix='/questions')
 app.register_blueprint(answers_module, url_prefix='/questions/<int:question_id>/answers')
 app.register_blueprint(comments_module, url_prefix='/answers/<int:answer_id>/comments')
 app.register_blueprint(chats_module, url_prefix='/chats')
+app.register_blueprint(messages_module, url_prefix='/chats/<int:chat_id>/messages')
