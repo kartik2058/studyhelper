@@ -90,6 +90,7 @@ class Chat(db.Model):
     __tablename__ = 'chats'
 
     id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
+    question = db.Column(db.Text, nullable=False)
 
     users = db.relationship('Chat', secondary=chat_members, backref='chats', lazy='dynamic')
     messages = db.relationship('Message', backref='chat', lazy='dynamic', cascade='all, delete-orphan')
