@@ -101,3 +101,20 @@ def get_user(user_id):
         return make_error('No user found with user_id: ' + str(user_id), 102)
 
     return jsonify({'status': 'success', 'user': user.serialize()})
+
+
+@users_module.route('/<int:user_id>/chats/', methods=['GET'])
+@users_module.route('/<int:user_id>/chats', methods=['GET'])
+def get_chats(user_id):
+    user = db.session.query(User).get(user_id)
+    if user is None:
+        return make_error('No user found with user_id: ' + str(user_id), 103)
+
+    chats_json = []
+    for chat in user.chats:
+        chats_json.append(chat.serialize())
+
+    if not chats_json:
+        return make_error('No chats found with user_id: ' + str(user_id), 104)
+
+    return jsonify({'status': 'success', 'chats': chats_json})
