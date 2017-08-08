@@ -48,27 +48,27 @@ def get_comment(answer_id, comment_id):
 def create_comment(answer_id):
     answer = db.session.query(Answer).get(answer_id)
     if answer is None:
-        return make_error('No answer found with id: ' + str(answer_id), 405)
+        return make_error('No answer found with id: ' + str(answer_id), 505)
 
     comment = request.form.get('comment')
     if comment is None:
-        return make_error('comment is not defined.', 406)
+        return make_error('comment is not defined.', 506)
     if not comment.strip():
-        return make_error('Comment field cannot be empty.', 407)
+        return make_error('Comment field cannot be empty.', 507)
 
     user_id = request.form.get('user_id')
     if user_id is None:
-        return make_error('user_id is not defined.', 408)
+        return make_error('user_id is not defined.', 508)
     if not user_id.strip():
-        return make_error('user_id cannot be empty.', 409)
+        return make_error('user_id cannot be empty.', 509)
     try:
         int(user_id)
     except:
-        return make_error('user_id is invalid.', 410)
+        return make_error('user_id is invalid.', 510)
 
     user = db.session.query(User).get(int(user_id))
     if user is None:
-        return make_error('No user found with user_id: ' + user_id, 411)
+        return make_error('No user found with user_id: ' + user_id, 511)
 
     new_comment = Comment(comment=comment, answer=answer, user=user)
     db.session.add(new_comment)
@@ -82,7 +82,7 @@ def create_comment(answer_id):
 def update_comment(answer_id, comment_id):
     answer = db.session.query(Answer).get(answer_id)
     if answer is None:
-        return make_error('No answer found with id: ' + str(answer_id), 412)
+        return make_error('No answer found with id: ' + str(answer_id), 512)
 
     comment = None
     for looping_comment in answer.comments:
@@ -90,13 +90,13 @@ def update_comment(answer_id, comment_id):
             comment = looping_comment
 
     if comment is None:
-        return make_error('No comment found with id: ' + str(comment_id), 413)
+        return make_error('No comment found with id: ' + str(comment_id), 513)
 
     new_comment = request.form.get('comment')
     if new_comment is None:
-        return make_error('comment is not defined.', 414)
+        return make_error('comment is not defined.', 514)
     if not new_comment.strip():
-        return make_error('Comment field cannot be empty.', 415)
+        return make_error('Comment field cannot be empty.', 515)
 
     comment.comment = new_comment
     comment.updated_on = datetime.datetime.utcnow()
@@ -111,7 +111,7 @@ def update_comment(answer_id, comment_id):
 def delete_comment(answer_id, comment_id):
     answer = db.session.query(Answer).get(answer_id)
     if answer is None:
-        return make_error('No answer found with id: ' + str(answer_id), 416)
+        return make_error('No answer found with id: ' + str(answer_id), 516)
 
     comment = None
     for looping_comment in answer.comments:
@@ -119,7 +119,7 @@ def delete_comment(answer_id, comment_id):
             comment = looping_comment
 
     if comment is None:
-        return make_error('No comment found with id: ' + str(comment_id), 417)
+        return make_error('No comment found with id: ' + str(comment_id), 517)
 
     db.session.delete(comment)
     db.session.commit()
