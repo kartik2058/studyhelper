@@ -88,9 +88,13 @@ def login():
         if check_password_hash(user.password, password):
             return jsonify({'status': 'success', 'user_id': user.id, 'authentication': 'You have been logged in successfully.'})
         else:
-            return make_error('Username and Password does not match.', 101)
+            error = {}
+            error['main'] = 'Username and Password does not match.'
+            return jsonify({'status': 'error', 'errors': error})
     else:
-        return make_error('Username and Password does not match.', 101)
+        error = {}
+        error['main'] = 'Username and Password does not match.'
+        return jsonify({'status': 'error', 'errors': error})
 
 
 @users_module.route('/<int:user_id>/', methods=['GET'])
