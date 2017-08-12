@@ -86,7 +86,7 @@ def login():
     user = db.session.query(User).filter_by(username=username).first()
     if user is not None:
         if check_password_hash(user.password, password):
-            return jsonify({'status': 'success', 'authentication': 'You have been logged in successfully.'})
+            return jsonify({'status': 'success', 'user_id': user.id, 'authentication': 'You have been logged in successfully.'})
         else:
             return make_error('Username and Password does not match.', 101)
     else:
