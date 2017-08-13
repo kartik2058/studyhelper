@@ -26,7 +26,7 @@ class User(db.Model):
         if not json_subjects:
             return {'id': self.id, 'username': self.username, 'points': self.points, 'subjects': None}
         return {'id': self.id, 'username': self.username, 'points': self.points, 'subjects': json_subjects}
-    
+
 
 class Subject(db.Model):
     __tablename__ = 'subjects'
