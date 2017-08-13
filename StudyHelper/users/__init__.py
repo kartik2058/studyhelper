@@ -40,23 +40,12 @@ def signup():
     else:
         errors['password'] = 'Password not defined.'
 
-    subjects_interested_in = request.form.get('subjects_interested_in')
-    if subjects_interested_in is None:
-        errors['subjects_interested_in'] = 'Interested Subjects not defined.'
-    else:
-        subjects_interested_in = [int(x) for x in re.compile("^\s+|\s*,\s*|\s+$").split(subjects_interested_in) if x]
-
     if errors:
         return jsonify({'status': 'error', 'errors': errors})
     else:
         password = generate_password_hash(password)
         new_user = User(username=username, password=password)
         db.session.add(new_user)
-
-        for subject in subjects_interested_in:
-            subject = db.session.query(Subject).get(subject)
-            if subject is not None:
-                subject.students.append(new_user)
 
         db.session.commit()
 
