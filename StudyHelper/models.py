@@ -44,6 +44,7 @@ class Question(db.Model):
     __tablename__ = 'questions'
 
     id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
+    title = db.Column(db.String, nullable=False)
     question = db.Column(db.Text, nullable=False)
     posted_on = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
     updated_on = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
@@ -54,7 +55,7 @@ class Question(db.Model):
     answers = db.relationship('Answer', backref='question', lazy='dynamic', cascade='all, delete-orphan')
 
     def serialize(self):
-        return {'id': self.id, 'question': self.question, 'posted_on': self.posted_on, 'updated_on': self.updated_on, 'asked_by': self.user_id, 'subject_id': self.subject_id}
+        return {'id': self.id, 'title': self.title, 'question': self.question, 'posted_on': self.posted_on, 'updated_on': self.updated_on, 'asked_by': self.user_id, 'subject_id': self.subject_id}
 
 
 class Answer(db.Model):
