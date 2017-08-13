@@ -20,8 +20,13 @@ class User(db.Model):
     messages = db.relationship('Message', backref='user', lazy='dynamic')
 
     def serialize(self):
-        return {'id': self.id, 'username': self.username, 'points': self.points}
-
+        json_subjects = []
+        for subject in self.subjects:
+            json_subjects.append(subject.serialize())
+        if not json_subjects:
+            return {'id': self.id, 'username': self.username, 'points': self.points, 'subjects': None}
+        return {'id': self.id, 'username': self.username, 'points': self.points, 'subjects': json_subjects}
+    
 
 class Subject(db.Model):
     __tablename__ = 'subjects'
