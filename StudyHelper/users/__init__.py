@@ -122,3 +122,23 @@ def get_chats(user_id):
         return make_error('No chats found with user_id: ' + str(user_id), 104)
 
     return jsonify({'status': 'success', 'chats': chats_json})
+
+
+@users_module.route('/<int:user_id>/add_interested_subject/', methods=['POST'])
+@users_module.route('/<int:user_id>/add_interested_subject', methods=['POST'])
+def add_interested_subject(user_id):
+    subject_name = request.form.get('subject_name')
+    if subject_name is None:
+        return make_error('subject_name not defined.', 105)
+    elif not subject_name.strip():
+        return make_error('subject_name cannot be empty.', 106)
+
+    subject = db.session.query(Subject).filter_by(name=subject_name).first()
+    if subject is None:
+        return make_error('No subject found with subject_name: ' + subject_name, 107)
+
+    user = db.session.query(User).get(user_id)
+    subject.students.append(user)
+    db.session.commit()
+
+    return jsonify({'status': 'success'})
