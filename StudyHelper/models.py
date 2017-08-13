@@ -55,7 +55,7 @@ class Question(db.Model):
     answers = db.relationship('Answer', backref='question', lazy='dynamic', cascade='all, delete-orphan')
 
     def serialize(self):
-        return {'id': self.id, 'title': self.title, 'question': self.question, 'posted_on': self.posted_on, 'updated_on': self.updated_on, 'asked_by': self.user_id, 'subject_id': self.subject_id}
+        return {'id': self.id, 'title': self.title, 'question': self.question, 'posted_on': self.posted_on, 'updated_on': self.updated_on, 'asked_by': self.user.username, 'subject': self.subject.name}
 
 
 class Answer(db.Model):
