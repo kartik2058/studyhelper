@@ -77,11 +77,21 @@ def create_question():
     except:
         return make_error('user_id is invalid.', 311)
 
+    subject_name = request.form.get('subject_name')
+    if subject_name is None:
+        return make_error('subject_name is not defined.', 312)
+    elif not subject_name.strip():
+        return make_error('subject_name cannot be empty.', 313)
+
     user = db.session.query(User).get(int(user_id))
     if user is None:
-        return make_error('No user found with user_id: ' + user_id, 312)
+        return make_error('No user found with user_id: ' + user_id, 314)
 
-    new_question = Question(question=question, title=title, user=user)
+    subject = db.session.query(Subject).filter_by(name=subject_name).first()
+    if subject is None:
+        return make_error('No subject found with subject_name: ' + subject_name, 315)
+
+    new_question = Question(question=question, title=title, user=user, subject=subject)
 
     db.session.add(new_question)
     db.session.commit()
@@ -95,25 +105,37 @@ def update_question(question_id):
     question = db.session.query(Question).get(question_id)
 
     if question is None:
-        return make_error('No question was found with id: ' + str(question_id), 313)
+        return make_error('No question was found with id: ' + str(question_id), 316)
 
     new_question = request.form.get('question')
     if new_question is not None:
         if not new_question.strip():
-            return make_error('Question field cannot be empty.', 314)
+            return make_error('Question field cannot be empty.', 317)
         else:
             question.question = new_question
     else:
-        return make_error('question is not defined.', 315)
+        return make_error('question is not defined.', 318)
 
     new_title = request.form.get('title')
     if new_title is not None:
         if not new_title.strip():
-            return make_error('Title field cannot be empty.', 316)
+            return make_error('Title field cannot be empty.', 319)
         else:
             question.title = new_title
     else:
-        return make_error('title is not defined.', 317)
+        return make_error('title is not defined.', 320)
+
+    subject_name = request.form.get('subject_name')
+    if subject_name is None:
+        return make_error('subject_name is not defined.', 321)
+    elif not subject_name.strip():
+        return make_error('subject_name cannot be empty.', 322)
+
+    subject = db.session.query(Subject).filter_by(name=subject_name).first()
+    if subject is None:
+        return make_error('No subject found with subject_name: ' + subject_name, 323)
+
+    question.subject = subject
 
     question.updated_on = datetime.datetime.utcnow()
 
