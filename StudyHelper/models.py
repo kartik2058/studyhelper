@@ -16,7 +16,6 @@ class User(db.Model):
     subjects = db.relationship('Subject', secondary=subjects_interested_in, backref='students', lazy='dynamic')
     questions = db.relationship('Question', backref='user', lazy='dynamic')
     answers = db.relationship('Answer', backref='user', lazy='dynamic')
-    comments = db.relationship('Comment', backref='user', lazy='dynamic', cascade='all, delete-orphan')
     messages = db.relationship('Message', backref='user', lazy='dynamic')
 
     def serialize(self):
@@ -65,31 +64,12 @@ class Answer(db.Model):
     answer = db.Column(db.Text, nullable=False)
     posted_on = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
     updated_on = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
-    is_suggested = db.Column(db.Boolean, default=False, nullable=False)
-    votes = db.Column(db.Integer, default=0, nullable=False)
 
     question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    comments = db.relationship('Comment', backref='answer', lazy='dynamic', cascade='all, delete-orphan')
-
     def serialize(self):
-        return {'id': self.id, 'answer': self.answer, 'posted_on': self.posted_on, 'updated_on': self.updated_on, 'is_suggested': self.is_suggested, 'votes': self.votes, 'answered_by': self.user.username, 'question_id': self.question_id}
-
-
-class Comment(db.Model):
-    __tablename__ = 'comments'
-
-    id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
-    comment = db.Column(db.Text, nullable=False)
-    posted_on = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
-    updated_on = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
-
-    answer_id = db.Column(db.Integer, db.ForeignKey('answers.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-
-    def serialize(self):
-        return {'id': self.id, 'comment': self.comment, 'posted_on': self.posted_on, 'updated_on': self.updated_on, 'commented_by': self.user_id, 'answer_id': self.answer_id}
+        return {'id': self.id, 'answer': self.answer, 'posted_on': self.posted_on, 'updated_on': self.updated_on, 'answered_by': self.user.username, 'question_id': self.question_id}
 
 
 class Chat(db.Model):

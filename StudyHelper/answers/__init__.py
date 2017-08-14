@@ -76,31 +76,3 @@ def create_answer(question_id):
     db.session.commit()
 
     return jsonify({'status': 'success', 'answer_id': new_answer.id})
-
-
-@answers_module.route('/<int:answer_id>/update/', methods=['POST'])
-@answers_module.route('/<int:answer_id>/update', methods=['POST'])
-def update_answer(question_id, answer_id):
-    question = db.session.query(Question).get(question_id)
-    if question is None:
-        return make_error('No question found with id: ' + str(question_id), 412)
-
-    answer = None
-    for looping_answer in question.answers:
-        if looping_answer.id == answer_id:
-            answer = looping_answer
-
-    if answer is None:
-        return make_error('No answer found with id: ' + str(answer_id), 413)
-
-    new_answer = request.form.get('answer')
-    if new_answer is None:
-        return make_error('answer is not defined.', 414)
-    if not new_answer.strip():
-        return make_error('Answer field cannot be empty.', 415)
-
-    answer.answer = new_answer
-    answer.updated_on = datetime.datetime.utcnow()
-    db.session.commit()
-
-    return jsonify({'status': 'success'})
