@@ -74,7 +74,7 @@ class Answer(db.Model):
     comments = db.relationship('Comment', backref='answer', lazy='dynamic', cascade='all, delete-orphan')
 
     def serialize(self):
-        return {'id': self.id, 'answer': self.answer, 'posted_on': self.posted_on, 'updated_on': self.updated_on, 'is_suggested': self.is_suggested, 'votes': self.votes, 'answered_by': self.user_id, 'question_id': self.question_id}
+        return {'id': self.id, 'answer': self.answer, 'posted_on': self.posted_on, 'updated_on': self.updated_on, 'is_suggested': self.is_suggested, 'votes': self.votes, 'answered_by': self.user.username, 'question_id': self.question_id}
 
 
 class Comment(db.Model):
