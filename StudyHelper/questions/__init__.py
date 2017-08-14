@@ -68,13 +68,32 @@ def get_questions_by_subjects(subject_names):
     return jsonify({'status': 'success', 'questions': questions_json})
 
 
+@questions_module.route('/users/<int:user_id>/', methods=['GET'])
+@questions_module.route('/users/<int:user_id>', methods=['GET'])
+def get_questions_by_user(user_id):
+    user = db.session.query(User).get(user_id)
+    if user is None:
+        return make_error('No user found with user_id: ' + str(user_id), 306)
+
+    questions = db.session.query(Question).filter_by(user=user).all()
+
+    questions_json = []
+    for question in questions:
+        questions_json.append(question.serialize())
+
+    if not questions_json:
+        return make_error('No question found.', 307)
+
+    return jsonify({'status': 'success', 'questions': questions_json})
+
+
 @questions_module.route('/<int:question_id>/', methods=['GET'])
 @questions_module.route('/<int:question_id>', methods=['GET'])
 def get_question(question_id):
     question = db.session.query(Question).get(question_id)
 
     if question is None:
-        return make_error('No question found with question_id: ' + str(question_id), 306)
+        return make_error('No question found with question_id: ' + str(question_id), 308)
 
     return jsonify({'status': 'success', 'questions': question.serialize()})
 
@@ -84,40 +103,40 @@ def get_question(question_id):
 def create_question():
     question = request.form.get('question')
     if question is None:
-        return make_error('question is not defined.', 307)
+        return make_error('question is not defined.', 309)
     elif not question.strip():
-        return make_error('Question field cannot be empty.', 308)
+        return make_error('Question field cannot be empty.', 310)
 
     title = request.form.get('title')
     if title is None:
-        return make_error('title is not defined.', 309)
+        return make_error('title is not defined.', 311)
     elif not title.strip():
-        return make_error('Title field cannot be empty.', 310)
+        return make_error('Title field cannot be empty.', 312)
 
     user_id = request.form.get('user_id')
     if user_id is None:
-        return make_error('user_id is not defined.', 311)
+        return make_error('user_id is not defined.', 313)
     elif not user_id.strip():
-        return make_error('user_id cannot be empty.', 312)
+        return make_error('user_id cannot be empty.', 314)
 
     try:
         int(user_id)
     except:
-        return make_error('user_id is invalid.', 313)
+        return make_error('user_id is invalid.', 315)
 
     subject_name = request.form.get('subject_name')
     if subject_name is None:
-        return make_error('subject_name is not defined.', 314)
+        return make_error('subject_name is not defined.', 316)
     elif not subject_name.strip():
-        return make_error('subject_name cannot be empty.', 315)
+        return make_error('subject_name cannot be empty.', 317)
 
     user = db.session.query(User).get(int(user_id))
     if user is None:
-        return make_error('No user found with user_id: ' + user_id, 316)
+        return make_error('No user found with user_id: ' + user_id, 318)
 
     subject = db.session.query(Subject).filter_by(name=subject_name).first()
     if subject is None:
-        return make_error('No subject found with subject_name: ' + subject_name, 317)
+        return make_error('No subject found with subject_name: ' + subject_name, 319)
 
     new_question = Question(question=question, title=title, user=user, subject=subject)
 
@@ -133,35 +152,35 @@ def update_question(question_id):
     question = db.session.query(Question).get(question_id)
 
     if question is None:
-        return make_error('No question was found with id: ' + str(question_id), 318)
+        return make_error('No question was found with id: ' + str(question_id), 320)
 
     new_question = request.form.get('question')
     if new_question is not None:
         if not new_question.strip():
-            return make_error('Question field cannot be empty.', 319)
+            return make_error('Question field cannot be empty.', 321)
         else:
             question.question = new_question
     else:
-        return make_error('question is not defined.', 320)
+        return make_error('question is not defined.', 322)
 
     new_title = request.form.get('title')
     if new_title is not None:
         if not new_title.strip():
-            return make_error('Title field cannot be empty.', 321)
+            return make_error('Title field cannot be empty.', 323)
         else:
             question.title = new_title
     else:
-        return make_error('title is not defined.', 322)
+        return make_error('title is not defined.', 324)
 
     subject_name = request.form.get('subject_name')
     if subject_name is None:
-        return make_error('subject_name is not defined.', 323)
+        return make_error('subject_name is not defined.', 325)
     elif not subject_name.strip():
-        return make_error('subject_name cannot be empty.', 324)
+        return make_error('subject_name cannot be empty.', 326)
 
     subject = db.session.query(Subject).filter_by(name=subject_name).first()
     if subject is None:
-        return make_error('No subject found with subject_name: ' + subject_name, 325)
+        return make_error('No subject found with subject_name: ' + subject_name, 327)
 
     question.subject = subject
 
