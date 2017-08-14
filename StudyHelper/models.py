@@ -35,6 +35,7 @@ class Subject(db.Model):
     name = db.Column(db.String(120), unique=True, nullable=False)
 
     questions = db.relationship('Question', backref='subject', lazy='dynamic', cascade='all, delete-orphan')
+    chats = db.relationship('Chat', backref='subject', lazy='dynamic', cascade='all, delete-orphan')
 
     def serialize(self):
         return {'id': self.id, 'name': self.name}
@@ -80,6 +81,7 @@ class Chat(db.Model):
     question = db.Column(db.Text, nullable=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'))
 
     users = db.relationship('User', secondary=chat_members, backref='chats', lazy='dynamic')
     messages = db.relationship('Message', backref='chat', lazy='dynamic', cascade='all, delete-orphan')
@@ -91,7 +93,7 @@ class Chat(db.Model):
         if not users_json:
             return {'id': self.id, 'question': self.question}
 
-        return {'id': self.id, 'question': self.question, 'created_by': self.user.username, 'chat_members': users_json}
+        return {'id': self.id, 'question': self.question, 'created_by': self.user.username, 'subject': self.subject.name, 'chat_members': users_json}
 
 
 class Message(db.Model):

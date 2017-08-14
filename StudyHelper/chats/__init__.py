@@ -1,5 +1,5 @@
 from flask import jsonify, request, Blueprint
-from StudyHelper.models import db, Chat, User
+from StudyHelper.models import db, Chat, User, Subject
 from StudyHelper import make_error
 
 chats_module = Blueprint('chats', __name__)
@@ -55,7 +55,17 @@ def create_chat():
     if user is None:
         return make_error('No user found with user_id: ' + user_id, 609)
 
-    chat = Chat(question=question, user=user)
+    subject_name = request.form.get('subject_name')
+    if subject_name is None:
+        return make_error('subject_name is not defined.', 610)
+    elif not subject_name.strip():
+        return make_error('subject_name cannot be empty.', 611)
+
+    subject = db.session.query(Subject).filter_by(name=subject_name).first()
+    if subject is None:
+        return make_error('No subject found with subject_name: ' + subject_name, 612)
+
+    chat = Chat(question=question, user=user, subject=subject)
     db.session.add(chat)
     db.session.commit()
 
