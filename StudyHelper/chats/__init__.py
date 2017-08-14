@@ -40,7 +40,22 @@ def create_chat():
     elif not question.strip():
         return make_error('Questions cannot be empty', 605)
 
-    chat = Chat(question=question)
+    user_id = request.form.get('user_id')
+    if user_id is None:
+        return make_error('user_id is not defined.', 606)
+    elif not user_id.strip():
+        return make_error('user_id cannot be empty.', 607)
+
+    try:
+        int(user_id)
+    except:
+        return make_error('user_id is invalid.', 608)
+
+    user = db.session.query(User).get(int(user_id))
+    if user is None:
+        return make_error('No user found with user_id: ' + user_id, 609)
+
+    chat = Chat(question=question, user=user)
     db.session.add(chat)
     db.session.commit()
 
