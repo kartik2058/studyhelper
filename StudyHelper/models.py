@@ -105,4 +105,4 @@ class Message(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     def serialize(self):
-        return {'id': self.id, 'message': self.message, 'posted_on': self.posted_on, 'chat': self.chat_id, 'posted_by': self.user_id}
+        return {'id': self.id, 'message': self.message, 'posted_on': self.posted_on, 'chat': self.chat_id, 'posted_by': self.user.username}
