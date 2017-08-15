@@ -91,7 +91,7 @@ class Chat(db.Model):
         if not users_json:
             return {'id': self.id, 'question': self.question}
 
-        return {'id': self.id, 'question': self.question, 'created_by': self.user.username, 'subject': self.subject.name, 'chat_members': users_json}
+        return {'id': self.id, 'question': self.question, 'subject': self.subject.name, 'chat_members': users_json}
 
 
 class Message(db.Model):
