@@ -5,14 +5,25 @@ from StudyHelper import make_error
 chats_module = Blueprint('chats', __name__)
 
 
-@chats_module.route('/', methods=['GET'])
-@chats_module.route('', methods=['GET'])
-def get_chats():
+@chats_module.route('/subjects/<string:subject_names>/', methods=['GET'])
+@chats_module.route('/subjects/<string:subject_names>', methods=['GET'])
+def get_chats(subject_names):
+    subject_names = subject_names.split(',')
+
+    subjects = []
+    for subject_name in subject_names:
+        subjects.append(db.session.query(Subject).filter_by(name=subject_name).first())
+
     chats = db.session.query(Chat).all()
 
     chats_json = []
     for chat in chats:
-        chats_json.append(chat.serialize())
+        is_addable = False
+        for subject in subjects:
+            if chat.subject == subject:
+                is_addable = True
+        if is_addable:
+            chats_json.append(chat.serialize())
 
     if not chats_json:
         return make_error('No chats found.', 601)
