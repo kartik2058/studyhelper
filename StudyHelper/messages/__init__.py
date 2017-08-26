@@ -15,7 +15,7 @@ def get_messages(chat_id):
     messages = db.session.query(Message).filter_by(chat=chat).all()
 
     messages_json = []
-    for message in messages:
+    for message in reversed(messages):
         messages_json.append(message.serialize())
 
     if not messages_json:
