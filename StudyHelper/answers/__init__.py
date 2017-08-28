@@ -16,7 +16,7 @@ def get_answers(question_id):
     answers = db.session.query(Answer).filter_by(question=question).all()
 
     answers_json = []
-    for answer in answers:
+    for answer in reversed(answers):
         answers_json.append(answer.serialize())
 
     if not answers:
